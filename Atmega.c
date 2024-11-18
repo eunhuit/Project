@@ -1,3 +1,10 @@
+/*
+ * GccApplication2.c
+ *
+ * Created: 2024-11-18 오후 5:39:36
+ * Author : competitor
+ */ 
+
 #include <avr/io.h>
 #include <stdio.h>
 #include <util/delay.h>
@@ -6,6 +13,12 @@ void Putch0(char data)
 {
 	while(!(UCSR1A & 0x20));
 	UDR1 = data;
+}
+
+void sendString(const char* str) {
+	while (*str) {
+		Putch0(*str++);
+	}
 }
 
 int main(void)
@@ -18,13 +31,10 @@ int main(void)
 	UBRR1L = 103;
     while (1) 
     {
-		Putch0('\n');
-		Putch0('t');
-		Putch0('e');
-		Putch0('s');
-		Putch0('t');
-		Putch0('\r');
-		_delay_ms(300);
+		sendString("\nLEDON\r");
+		_delay_ms(3000);
+		sendString("\nLEDOFF\r");
+		_delay_ms(3000);
     }
 }
 
