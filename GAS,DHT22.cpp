@@ -1,39 +1,55 @@
 #include "DHT.h"
+#include <PMS.h>
+#include <SoftwareSerial.h>
 #include <LiquidCrystal_I2C.h>
+
 
 int GasPin = A0;
 int Gas = 0;
 DHT dht(2, DHT22);
-LiquidCrystal_I2C lcd(0x27, 16, 2);
+SoftwareSerial nockanda(9,10);
 
-void setup() {
+PMS pms(nockanda);
+PMS::DATA data;
+
+void setup()
+{
+  Serial.begin(115200); 
+  nockanda.begin(9600);
   pinMode(GasPin, INPUT);
-  Serial.begin(9600);
   dht.begin();
 }
 
-void loop() {
-  float h = dht.readHumidity();
-  float t = dht.readTemperature();
-  float hic = dht.computeHeatIndex(t, h, false);
-  Gas = analogRead(GasPin);
-  lcd.init();
-  lcd.backlight();
-  lcd.setCursor(0, 0);
-  lcd.print("Gas: ");
-  lcd.setCursor(5, 0);
-  lcd.print(Gas);
-  lcd.setCursor(0, 1);
-  lcd.print("H: ");
-  lcd.setCursor(2, 1);
-  lcd.print(h);
-  lcd.setCursor(6, 1);
-  lcd.print("%");
-  lcd.setCursor(7, 1);
-  lcd.print("T: ");
-  lcd.setCursor(9, 1);
-  lcd.print(t);
-  lcd.setCursor(14, 1);
-  lcd.print("*C");
-  delay(1000);
+void loop()
+{
+  if (pms.read(data))
+  {
+    Serial.print("1");
+    delay(1000);
+    Serial.print("0");
+    delay(1000); 
+    float mesei = data.PM_AE_UG_10_0;
+    float chomesei = data.PM_AE_UG_2_5;
+    float gukchomesei = data.PM_AE_UG_1_0;
+    float h = dht.readHumidity();
+    float t = dht.readTemperature();
+    Gas = analogRead(GasPin);
+    Serial.print("온도:");
+    Serial.println(h);
+    Serial.print("습도:");
+    Serial.println(t);
+    Serial.print("가스농도:");
+    Serial.println(Gas);    
+    Serial.print("미세먼지:");
+    Serial.println(mesei);
+    Serial.print("초미세먼지:");
+    Serial.println(chomesei);
+    Serial.print("극초미세먼지:");
+    Serial.println(gukchomesei);
+
+    Serial.println();
+  }else{
+    //Serial.print("FUCK");
+  }
+
 }
